@@ -132,3 +132,18 @@ func (m *Machine) PowerOff(systemID string, comment string, stopMode string) (ma
 	})
 	return
 }
+
+func (m *Machine) Release(systemID string, comment string, machines string) (ma *entity.Machine, err error) {
+	qsp := make(url.Values)
+	if comment != "" {
+		qsp.Set("comment", comment)
+	}
+	if machines != "" {
+		qsp.Set("machines", machines)
+	}
+	ma = new(entity.Machine)
+	err = m.client(systemID).Post("release", qsp, func(data []byte) error {
+		return json.Unmarshal(data, ma)
+	})
+	return
+}
