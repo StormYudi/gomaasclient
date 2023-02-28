@@ -15,5 +15,4 @@ type Machine interface {
 	GetPowerParameters(systemID string) (map[string]string, error)
 	PowerOn(systemID string, comment string, userData string) (*entity.Machine, error)
 	PowerOff(systemID string, comment string, stopMode string) (*entity.Machine, error)
-	Release(systemID string, comment string, machines string) (*entity.Machine, error)
 }
