@@ -103,7 +103,7 @@ func (m *Machine) GetPowerParameters(systemID string) (params map[string]string,
 	return
 }
 
-func (m *Machine) PowerOn(systemID string, comment string, userData string){
+func (m *Machine) PowerOn(systemID string, comment string, userData string) (ma *entity.Machine, err error) {
 	qsp := make(url.Values)
 	if comment != "" {
 		qsp.Set("comment", comment)
@@ -118,7 +118,7 @@ func (m *Machine) PowerOn(systemID string, comment string, userData string){
 	return
 }
 
-func (m *Machine) PowerOff(systemID string, comment string, stopMode string){
+func (m *Machine) PowerOff(systemID string, comment string, stopMode string) (ma *entity.Machine, err error) {
 	qsp := make(url.Values)
 	if comment != "" {
 		qsp.Set("comment", comment)
