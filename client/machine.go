@@ -132,3 +132,22 @@ func (m *Machine) PowerOff(systemID string, comment string, stopMode string) (ma
 	})
 	return
 }
+
+// Test machine.
+func (m *Machine) Test(systemID string, enableSSH bool, params string, testingScripts string) (ma *entity.Machine, err error) {
+	qsp := make(url.Values)
+	if enableSSH == true {
+		qsp.Add("enable_ssh", "1")
+	}
+	if params != "" {
+		qsp.Add("parameters", params)
+	}
+	if testingScripts != "" {
+		qsp.Add("testing_scripts", testingScripts)
+	}
+	ma = new(entity.Machine)
+	err = m.client(systemID).Post("test", qsp, func(data []byte) error {
+		return json.Unmarshal(data, ma)
+	})
+	return
+}
