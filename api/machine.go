@@ -15,5 +15,5 @@ type Machine interface {
 	GetPowerParameters(systemID string) (map[string]string, error)
 	PowerOn(systemID string, comment string, userData string) (*entity.Machine, error)
 	PowerOff(systemID string, comment string, stopMode string) (*entity.Machine, error)
-	Test(systemID string, enableSSH int, params string, testingScripts string) (*entity.Machine, error)
+	Test(systemID string, enableSSH bool, params string, testingScripts string) (*entity.Machine, error)
 }
