@@ -314,36 +314,6 @@ func (m *Machine) GetCurtinConfig(systemID string) (map[string]interface{}, erro
 	return curtinConfig, err
 }
 
-func (m *Machine) PowerOn(systemID string, comment string, userData string) (ma *entity.Machine, err error) {
-	qsp := make(url.Values)
-	if comment != "" {
-		qsp.Set("comment", comment)
-	}
-	if userData != "" {
-		qsp.Set("user_data", userData)
-	}
-	ma = new(entity.Machine)
-	err = m.client(systemID).Post("power_on", qsp, func(data []byte) error {
-		return json.Unmarshal(data, ma)
-	})
-	return
-}
-
-func (m *Machine) PowerOff(systemID string, comment string, stopMode string) (ma *entity.Machine, err error) {
-	qsp := make(url.Values)
-	if comment != "" {
-		qsp.Set("comment", comment)
-	}
-	if stopMode != "" {
-		qsp.Set("stop_mode", stopMode)
-	}
-	ma = new(entity.Machine)
-	err = m.client(systemID).Post("power_off", qsp, func(data []byte) error {
-		return json.Unmarshal(data, ma)
-	})
-	return
-}
-
 // Test machine.
 func (m *Machine) Test(systemID string, enableSSH bool, params string, testingScripts string) (ma *entity.Machine, err error) {
 	qsp := make(url.Values)
