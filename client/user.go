@@ -5,25 +5,29 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/maas/gomaasclient/entity"
+	"github.com/canonical/gomaasclient/entity"
 )
 
+// User implements api.User
 type User struct {
-	ApiClient ApiClient
+	APIClient APIClient
 }
 
-func (u *User) client(userName string) ApiClient {
-	return u.ApiClient.GetSubObject(fmt.Sprintf("users/%s", userName))
+func (u *User) client(userName string) APIClient {
+	return u.APIClient.GetSubObject(fmt.Sprintf("users/%s", userName))
 }
 
-func (u *User) Get(userName string) (user *entity.User, err error) {
-	user = new(entity.User)
-	err = u.client(userName).Get("", url.Values{}, func(data []byte) error {
+// Get fetches a User by username
+func (u *User) Get(userName string) (*entity.User, error) {
+	user := new(entity.User)
+	err := u.client(userName).Get("", url.Values{}, func(data []byte) error {
 		return json.Unmarshal(data, user)
 	})
-	return
+
+	return user, err
 }
 
+// Delete deletes a given User
 func (u *User) Delete(userName string) error {
 	return u.client(userName).Delete()
 }

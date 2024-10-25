@@ -3,45 +3,55 @@ package client
 import (
 	"encoding/json"
 
+	"github.com/canonical/gomaasclient/entity"
 	"github.com/google/go-querystring/query"
-	"github.com/maas/gomaasclient/entity"
 )
 
+// IPAddresses implements api.IPAddresses
 type IPAddresses struct {
-	ApiClient ApiClient
+	APIClient APIClient
 }
 
-func (i *IPAddresses) client() ApiClient {
-	return i.ApiClient.GetSubObject("ipaddresses")
+func (i *IPAddresses) client() APIClient {
+	return i.APIClient.GetSubObject("ipaddresses")
 }
 
-func (i *IPAddresses) Get(params *entity.IPAddressesParams) (ipAddresses []entity.IPAddress, err error) {
+// Get fetches a specified set of IPAddresses
+func (i *IPAddresses) Get(params *entity.IPAddressesParams) ([]entity.IPAddress, error) {
 	qsp, err := query.Values(params)
 	if err != nil {
-		return
+		return nil, err
 	}
+
+	ipAddresses := make([]entity.IPAddress, 0)
 	err = i.client().Get("", qsp, func(data []byte) error {
 		return json.Unmarshal(data, &ipAddresses)
 	})
-	return
+
+	return ipAddresses, err
 }
 
+// Release releases a set of allocated IPAddresses
 func (i *IPAddresses) Release(params *entity.IPAddressesParams) error {
 	qsp, err := query.Values(params)
 	if err != nil {
 		return err
 	}
+
 	return i.client().Post("release", qsp, func(data []byte) error { return nil })
 }
 
-func (i *IPAddresses) Reserve(params *entity.IPAddressesParams) (ipAddress *entity.IPAddress, err error) {
+// Reserve reserves a set of IPAddresses
+func (i *IPAddresses) Reserve(params *entity.IPAddressesParams) (*entity.IPAddress, error) {
 	qsp, err := query.Values(params)
 	if err != nil {
-		return
+		return nil, err
 	}
-	ipAddress = new(entity.IPAddress)
+
+	ipAddress := new(entity.IPAddress)
 	err = i.client().Post("reserve", qsp, func(data []byte) error {
 		return json.Unmarshal(data, ipAddress)
 	})
-	return
+
+	return ipAddress, err
 }

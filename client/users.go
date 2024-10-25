@@ -1,36 +1,44 @@
+//nolint:dupl // disable dupl check on client for now
 package client
 
 import (
 	"encoding/json"
 	"net/url"
 
+	"github.com/canonical/gomaasclient/entity"
 	"github.com/google/go-querystring/query"
-	"github.com/maas/gomaasclient/entity"
 )
 
+// Users implements api.Users
 type Users struct {
-	ApiClient ApiClient
+	APIClient APIClient
 }
 
-func (u *Users) client() ApiClient {
-	return u.ApiClient.GetSubObject("users")
+func (u *Users) client() APIClient {
+	return u.APIClient.GetSubObject("users")
 }
 
-func (u *Users) Get() (users []entity.User, err error) {
-	err = u.client().Get("", url.Values{}, func(data []byte) error {
+// Get fetches a list of User objects
+func (u *Users) Get() ([]entity.User, error) {
+	users := make([]entity.User, 0)
+	err := u.client().Get("", url.Values{}, func(data []byte) error {
 		return json.Unmarshal(data, &users)
 	})
-	return
+
+	return users, err
 }
 
-func (u *Users) Create(params *entity.UserParams) (user *entity.User, err error) {
+// Create creates a new User
+func (u *Users) Create(params *entity.UserParams) (*entity.User, error) {
 	qsp, err := query.Values(params)
 	if err != nil {
 		return nil, err
 	}
-	user = new(entity.User)
+
+	user := new(entity.User)
 	err = u.client().Post("", qsp, func(data []byte) error {
 		return json.Unmarshal(data, user)
 	})
-	return
+
+	return user, err
 }

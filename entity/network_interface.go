@@ -1,44 +1,44 @@
 package entity
 
-// NetworkInterface represents the MaaS Interface endpoint.
+// NetworkInterface represents the MAAS Interface endpoint.
 type NetworkInterface struct {
-	VLAN               VLAN                   `json:"vlan,omitempty"`
-	Children           []string               `json:"children,omitempty"`
-	Parents            []string               `json:"parents,omitempty"`
-	Tags               []string               `json:"tags,omitempty"`
-	Discovered         []NetworkInterfaceLink `json:"discovered,omitempty"`
-	Links              []NetworkInterfaceLink `json:"links,omitempty"`
-	Name               string                 `json:"name,omitempty"`
-	MACAddress         string                 `json:"mac_address,omitempty"`
-	Product            string                 `json:"product,omitempty"`
-	FirmwareVersion    string                 `json:"firmware_version,omitempty"`
-	SystemID           string                 `json:"system_id,omitempty"`
-	Params             interface{}            `json:"params,omitempty"`
-	Type               string                 `json:"type,omitempty"`
-	Vendor             string                 `json:"vendor,omitempty"`
-	ResourceURI        string                 `json:"resource_uri,omitempty"`
-	BondXMitHashPolicy string                 `json:"bond_x_mit_hash_policy,omitempty"`
-	BondMode           string                 `json:"bond_mode,omitempty"`
-	MTU                string                 `json:"mtu,omitempty"`
-	EffectiveMTU       int                    `json:"effective_mtu,omitempty"`
-	ID                 int                    `json:"id,omitempty"`
-	BridgeFD           int                    `json:"bridge_fd,omitempty"`
-	BondMIIMon         int                    `json:"bond_mii_mon,omitempty"`
-	BondDownDelay      int                    `json:"bond_down_delay,omitempty"`
-	BondUpDelay        int                    `json:"bond_up_delay,omitempty"`
-	BondLACPRate       int                    `json:"bond_lacp_rate,omitempty"`
-	AcceptRA           bool                   `json:"accept_ra,omitempty"`
-	Autoconf           bool                   `json:"autoconf,omitempty"`
-	Enabled            bool                   `json:"enabled,omitempty"`
-	BridgeSTP          bool                   `json:"bridge_stp,omitempty"`
+	Params          interface{}                    `json:"params,omitempty"`
+	Name            string                         `json:"name,omitempty"`
+	Product         string                         `json:"product,omitempty"`
+	MACAddress      string                         `json:"mac_address,omitempty"`
+	FirmwareVersion string                         `json:"firmware_version,omitempty"`
+	Vendor          string                         `json:"vendor,omitempty"`
+	Type            string                         `json:"type,omitempty"`
+	SystemID        string                         `json:"system_id,omitempty"`
+	ResourceURI     string                         `json:"resource_uri,omitempty"`
+	Links           []NetworkInterfaceLink         `json:"links,omitempty"`
+	Parents         []string                       `json:"parents,omitempty"`
+	Children        []string                       `json:"children,omitempty"`
+	Tags            []string                       `json:"tags,omitempty"`
+	Discovered      []NetworkInterfaceDiscoveredIP `json:"discovered,omitempty"`
+	VLAN            VLAN                           `json:"vlan,omitempty"`
+	NUMANode        int                            `json:"numa_node,omitempty"`
+	LinkSpeed       int                            `json:"link_speed,omitempty"`
+	EffectiveMTU    int                            `json:"effective_mtu,omitempty"`
+	SRIOVMaxVF      int                            `json:"sriov_max_vf,omitempty"`
+	InterfaceSpeed  int                            `json:"interface_speed,omitempty"`
+	ID              int                            `json:"id,omitempty"`
+	Enabled         bool                           `json:"enabled,omitempty"`
+	LinkConnected   bool                           `json:"link_connected,omitempty"`
+}
+
+// NetworkInterfaceDiscoveredIP is consumed by NetworkInterface{} and should not be used directly.
+type NetworkInterfaceDiscoveredIP struct {
+	IPAddress string `json:"ip_address,omitempty"`
+	Subnet    Subnet `json:"subnet,omitempty"`
 }
 
 // NetworkInterfaceLink is consumed by NetworkInterface{} and should not be used directly.
 type NetworkInterfaceLink struct {
-	ID        int    `json:"id,omitempty"`
+	IPAddress string `json:"ip_address,omitempty"`
 	Mode      string `json:"mode,omitempty"`
 	Subnet    Subnet `json:"subnet,omitempty"`
-	IPAddress string `json:"ip_address,omitempty"`
+	ID        int    `json:"id,omitempty"`
 }
 
 // NetworkInterfaceLinkParams is used with NetworkInterface.LinkSubnet().
@@ -49,52 +49,111 @@ type NetworkInterfaceLink struct {
 // DefaultGateway is ignored unless Mode is AUTO or STATIC.
 // Note: You can parse an IP address into a net.IP via net.ParseIP(string).
 type NetworkInterfaceLinkParams struct {
+	IPAddress      string `url:"ip_address,omitempty"`
 	Mode           string `url:"mode,omitempty"`
 	Subnet         int    `url:"subnet,omitempty"`
-	Force          bool   `url:"force,omitempty"`
 	DefaultGateway bool   `url:"default_gateway"`
-	IPAddress      string `url:"ip_address,omitempty"`
+	Force          bool   `url:"force,omitempty"`
 }
 
-// NetworkInterfacePhysical is the parameters for the NetworkInterfaces create_physical POST operation.
+// NetworkInterfacePhysicalParams is the parameters for the NetworkInterfaces create_physical POST operation.
 type NetworkInterfacePhysicalParams struct {
-	MACAddress string `url:"mac_address,omitempty"`
-	Name       string `url:"name,omitempty"`
-	Tags       string `url:"tags,omitempty"`
-	VLAN       string `url:"vlan,omitempty"`
-	MTU        int    `url:"mtu,omitempty"`
-	AcceptRA   bool   `url:"accept_ra,omitempty"`
-	Autoconf   bool   `url:"autoconf,omitempty"`
+	Name           string `url:"name,omitempty"`
+	IPAddress      string `url:"ip_address,omitempty"`
+	IPAssignment   string `url:"ip_assignment,omitempty"`
+	MACAddress     string `url:"mac_address,omitempty"`
+	Tags           string `url:"tags,omitempty"`
+	InterfaceSpeed int    `url:"interface_speed,omitempty"`
+	LinkSpeed      int    `url:"link_speed,omitempty"`
+	MTU            int    `url:"mtu,omitempty"`
+	NUMANode       int    `url:"numa_node,omitempty"`
+	VLAN           int    `url:"vlan,omitempty"`
+	Enabled        bool   `url:"enabled,omitempty"`
+	LinkConnected  bool   `url:"link_connected,omitempty"`
+	AcceptRA       bool   `url:"accept_ra,omitempty"`
 }
 
-// NetworkInterfaceBond is the parameters for the NetworkInterfaces create_bond POST operation.
+// NetworkInterfaceBondParams is the parameters for the NetworkInterfaces create_bond POST operation.
 type NetworkInterfaceBondParams struct {
-	NetworkInterfacePhysicalParams
-	Parents            []int  `url:"parents,omitempty"`
+	IPAddress          string `url:"ip_address,omitempty"`
+	Tags               string `url:"tags,omitempty"`
+	BondLACPRate       string `url:"bond_lacp_rate,omitempty"`
 	BondMode           string `url:"bond_mode,omitempty"`
+	Name               string `url:"name,omitempty"`
+	MACAddress         string `url:"mac_address,omitempty"`
+	BondXMitHashPolicy string `url:"bond_xmit_hash_policy,omitempty"`
+	IPAssignment       string `url:"ip_assignment,omitempty"`
+	Parents            []int  `url:"parents,omitempty"`
+	InterfaceSpeed     int    `url:"interface_speed,omitempty"`
+	LinkSpeed          int    `url:"link_speed,omitempty"`
+	BondUpDelay        int    `url:"bond_updelay,omitempty"`
+	MTU                int    `url:"mtu,omitempty"`
+	BondNumberGratARP  int    `url:"bond_num_grat_arp,omitempty"`
 	BondMiimon         int    `url:"bond_miimon,omitempty"`
 	BondDownDelay      int    `url:"bond_downdelay,omitempty"`
-	BondUpDelay        int    `url:"bond_updelay,omitempty"`
-	BondLACPRate       string `url:"bond_lacp_rate,omitempty"`
-	BondXMitHashPolicy string `url:"bond_xmit_hash_policy,omitempty"`
-	BondNumberGratARP  int    `url:"bond_num_grat_arp,omitempty"`
+	VLAN               int    `url:"vlan,omitempty"`
+	AcceptRA           bool   `url:"accept_ra,omitempty"`
+	LinkConnected      bool   `url:"link_connected,omitempty"`
 }
 
-// NetworkInterfaceBridge is the parameters for the NetworkInterfaces create_bridge POST operation.
+// NetworkInterfaceBridgeParams is the parameters for the NetworkInterfaces create_bridge POST operation.
 type NetworkInterfaceBridgeParams struct {
-	NetworkInterfacePhysicalParams
-	Parent     int    `url:"parent,omitempty"`
-	Bridgetype string `url:"bridge_type,omitempty"`
-	BridgeSTP  bool   `url:"bridge_stp,omitempty"`
-	BridgeFD   int    `url:"bridge_fd,omitempty"`
+	IPAssignment   string `url:"ip_assignment,omitempty"`
+	MACAddress     string `url:"mac_address,omitempty"`
+	Tags           string `url:"tags,omitempty"`
+	BridgeType     string `url:"bridge_type,omitempty"`
+	IPAddress      string `url:"ip_address,omitempty"`
+	Name           string `url:"name,omitempty"`
+	Parents        []int  `url:"parents,omitempty"`
+	LinkSpeed      int    `url:"link_speed,omitempty"`
+	MTU            int    `url:"mtu,omitempty"`
+	BridgeFD       int    `url:"bridge_fd,omitempty"`
+	InterfaceSpeed int    `url:"interface_speed,omitempty"`
+	VLAN           int    `url:"vlan,omitempty"`
+	AcceptRA       bool   `url:"accept_ra,omitempty"`
+	LinkConnected  bool   `url:"link_connected,omitempty"`
+	BridgeSTP      bool   `url:"bridge_stp,omitempty"`
 }
 
-// NetworkInterfaceVLAN is the parameters for the NetworkInterfaces create_vlan POST operation.
+// NetworkInterfaceVLANParams is the parameters for the NetworkInterfaces create_vlan POST operation.
 type NetworkInterfaceVLANParams struct {
-	VLAN     string   `url:"vlan,omitempty"`
-	Parent   int      `url:"parent,omitempty"`
-	Tags     []string `url:"tags,omitempty"`
-	MTU      int      `url:"mtu,omitempty"`
-	AcceptRA bool     `url:"accept_ra,omitempty"`
-	Autoconf bool     `url:"autoconf,omitempty"`
+	IPAddress      string `url:"ip_address,omitempty"`
+	IPAssignment   string `url:"ip_assignment,omitempty"`
+	Name           string `url:"name,omitempty"`
+	Tags           string `url:"tags,omitempty"`
+	Parents        []int  `url:"parents,omitempty"`
+	InterfaceSpeed int    `url:"interface_speed,omitempty"`
+	LinkSpeed      int    `url:"link_speed,omitempty"`
+	MTU            int    `url:"mtu,omitempty"`
+	VLAN           int    `url:"vlan,omitempty"`
+	AcceptRA       bool   `url:"accept_ra,omitempty"`
+	LinkConnected  bool   `url:"link_connected,omitempty"`
+}
+
+// NetworkInterfaceUpdateParams is the parameters for the NetworkInterfaces update_bond POST operation.
+type NetworkInterfaceUpdateParams struct {
+	BridgeType         string `url:"bridge_type,omitempty"`
+	Tags               string `url:"tags,omitempty"`
+	BondLACPRate       string `url:"bond_lacp_rate,omitempty"`
+	BondMode           string `url:"bond_mode,omitempty"`
+	Name               string `url:"name,omitempty"`
+	MACAddress         string `url:"mac_address,omitempty"`
+	BondXMitHashPolicy string `url:"bond_xmit_hash_policy,omitempty"`
+	IPAssignment       string `url:"ip_assignment,omitempty"`
+	IPAddress          string `url:"ip_address,omitempty"`
+	Parents            []int  `url:"parents,omitempty"`
+	InterfaceSpeed     int    `url:"interface_speed,omitempty"`
+	BondUpDelay        int    `url:"bond_updelay,omitempty"`
+	VLAN               int    `url:"vlan,omitempty"`
+	BondDownDelay      int    `url:"bond_downdelay,omitempty"`
+	BridgeFD           int    `url:"bridge_fd,omitempty"`
+	BondMiimon         int    `url:"bond_miimon,omitempty"`
+	LinkSpeed          int    `url:"link_speed,omitempty"`
+	NUMANode           int    `url:"numa_node,omitempty"`
+	MTU                int    `url:"mtu,omitempty"`
+	BondNumberGratARP  int    `url:"bond_num_grat_arp,omitempty"`
+	Enabled            bool   `url:"enabled,omitempty"`
+	LinkConnected      bool   `url:"link_connected,omitempty"`
+	BridgeSTP          bool   `url:"bridge_stp,omitempty"`
+	AcceptRA           bool   `url:"accept_ra,omitempty"`
 }

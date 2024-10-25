@@ -1,3 +1,4 @@
+//nolint:dupl // disable dupl check on client for now
 package client
 
 import (
@@ -5,38 +6,45 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/canonical/gomaasclient/entity"
 	"github.com/google/go-querystring/query"
-	"github.com/maas/gomaasclient/entity"
 )
 
+// DNSResourceRecord implements api.DNSResourceRecord
 type DNSResourceRecord struct {
-	ApiClient ApiClient
+	APIClient APIClient
 }
 
-func (d *DNSResourceRecord) client(id int) ApiClient {
-	return d.ApiClient.GetSubObject(fmt.Sprintf("dnsresourcerecords/%v", id))
+func (d *DNSResourceRecord) client(id int) APIClient {
+	return d.APIClient.GetSubObject(fmt.Sprintf("dnsresourcerecords/%v", id))
 }
 
-func (d *DNSResourceRecord) Get(id int) (dnsResourceRecord *entity.DNSResourceRecord, err error) {
-	dnsResourceRecord = new(entity.DNSResourceRecord)
-	err = d.client(id).Get("", url.Values{}, func(data []byte) error {
+// Get fetches a given DNSResourceRecord
+func (d *DNSResourceRecord) Get(id int) (*entity.DNSResourceRecord, error) {
+	dnsResourceRecord := new(entity.DNSResourceRecord)
+	err := d.client(id).Get("", url.Values{}, func(data []byte) error {
 		return json.Unmarshal(data, dnsResourceRecord)
 	})
-	return
+
+	return dnsResourceRecord, err
 }
 
-func (d *DNSResourceRecord) Update(id int, params *entity.DNSResourceRecordParams) (dnsResourceRecord *entity.DNSResourceRecord, err error) {
+// Update updates a given DNSResourceRecord
+func (d *DNSResourceRecord) Update(id int, params *entity.DNSResourceRecordParams) (*entity.DNSResourceRecord, error) {
 	qsp, err := query.Values(params)
 	if err != nil {
-		return
+		return nil, err
 	}
-	dnsResourceRecord = new(entity.DNSResourceRecord)
+
+	dnsResourceRecord := new(entity.DNSResourceRecord)
 	err = d.client(id).Put(qsp, func(data []byte) error {
 		return json.Unmarshal(data, dnsResourceRecord)
 	})
-	return
+
+	return dnsResourceRecord, err
 }
 
+// Delete deletes a given DNSResourceRecord
 func (d *DNSResourceRecord) Delete(id int) error {
 	return d.client(id).Delete()
 }

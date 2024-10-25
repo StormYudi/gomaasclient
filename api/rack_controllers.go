@@ -1,10 +1,14 @@
 package api
 
 import (
-	"github.com/maas/gomaasclient/entity"
+	"github.com/canonical/gomaasclient/entity"
 )
 
-// RackControllers represents the MaaS Rack Controllers endpoint
+// RackControllers represents the MAAS Rack Controllers endpoint
 type RackControllers interface {
-	Get(*entity.RackControllerSearch) ([]entity.RackController, error)
+	DescribePowerTypes() ([]entity.PowerType, error)
+	IsRegistered(macAddress string) (bool, error)
+	GetPowerParameters(systemIDs []string) (map[string]interface{}, error)
+	Get(*entity.RackControllersGetParams) ([]entity.RackController, error)
+	SetZone(*entity.RackControllerSetZoneParams) error
 }

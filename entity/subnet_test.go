@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/maas/gomaasclient/test/helper"
+	"github.com/canonical/gomaasclient/test/helper"
 )
 
 var sampleSubnet Subnet = Subnet{
@@ -260,6 +260,7 @@ func TestSubnet(t *testing.T) {
 	if err := helper.TestdataFromJSON("maas/subnet.json", subnet); err != nil {
 		t.Fatal(err)
 	}
+
 	if err := helper.TestdataFromJSON("maas/subnets.json", subnets); err != nil {
 		t.Fatal(err)
 	}
@@ -268,6 +269,7 @@ func TestSubnet(t *testing.T) {
 	if diff := cmp.Diff(&sampleSubnet, subnet); diff != "" {
 		t.Fatalf("json.Decode(Subnet) mismatch (-want +got):\n%s", diff)
 	}
+
 	if diff := cmp.Diff(&sampleSubnets, subnets); diff != "" {
 		t.Fatalf("json.Decode([]Subnet) mismatch (-want +got):\n%s", diff)
 	}

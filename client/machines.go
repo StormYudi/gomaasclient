@@ -4,54 +4,67 @@ import (
 	"encoding/json"
 	"net/url"
 
+	"github.com/canonical/gomaasclient/entity"
 	"github.com/google/go-querystring/query"
-	"github.com/maas/gomaasclient/entity"
 )
 
-// Contains functionality for manipulating the Machines entity.
+// Machines contains functionality for manipulating the Machines entity.
 type Machines struct {
-	ApiClient ApiClient
+	APIClient APIClient
 }
 
-func (m *Machines) client() ApiClient {
-	return m.ApiClient.GetSubObject("machines")
+func (m *Machines) client() APIClient {
+	return m.APIClient.GetSubObject("machines")
 }
 
-// List machines.
-func (m *Machines) Get() (machines []entity.Machine, err error) {
-	err = m.client().Get("", url.Values{}, func(data []byte) error {
+// Get fetches a list machines.
+func (m *Machines) Get(machinesParams *entity.MachinesParams) ([]entity.Machine, error) {
+	qsp, err := query.Values(machinesParams)
+	if err != nil {
+		return nil, err
+	}
+
+	machines := make([]entity.Machine, 0)
+	err = m.client().Get("", qsp, func(data []byte) error {
 		return json.Unmarshal(data, &machines)
 	})
-	return
+
+	return machines, err
 }
 
 // Create machine.
-func (m *Machines) Create(machineParams *entity.MachineParams, powerParams map[string]string) (ma *entity.Machine, err error) {
+func (m *Machines) Create(machineParams *entity.MachineParams, powerParams map[string]interface{}) (*entity.Machine, error) {
 	qsp, err := query.Values(machineParams)
 	if err != nil {
-		return
+		return nil, err
 	}
-	for k, v := range powerParams {
-		qsp.Add(k, v)
+
+	for k, v := range powerParamsToURLValues(powerParams) {
+		// Since qsp.Add(k, v...) is not allowed
+		qsp[k] = append(qsp[k], v...)
 	}
-	ma = new(entity.Machine)
+
+	machine := new(entity.Machine)
 	err = m.client().Post("", qsp, func(data []byte) error {
-		return json.Unmarshal(data, ma)
+		return json.Unmarshal(data, machine)
 	})
-	return
+
+	return machine, err
 }
 
 // Allocate machine.
-func (m *Machines) Allocate(params *entity.MachineAllocateParams) (ma *entity.Machine, err error) {
+func (m *Machines) Allocate(params *entity.MachineAllocateParams) (*entity.Machine, error) {
 	qsp, err := query.Values(params)
 	if err != nil {
-		return
+		return nil, err
 	}
-	ma = new(entity.Machine)
+
+	machine := new(entity.Machine)
 	err = m.client().Post("allocate", qsp, func(data []byte) error {
-		return json.Unmarshal(data, ma)
+		return json.Unmarshal(data, machine)
 	})
-	return
+
+	return machine, err
 }
 
 // Release machine.
@@ -60,8 +73,26 @@ func (m *Machines) Release(systemIDs []string, comment string) error {
 	for _, val := range systemIDs {
 		qsp.Add("machines", val)
 	}
+
 	if comment != "" {
 		qsp.Add("comment", comment)
 	}
+
 	return m.client().Post("release", qsp, func(data []byte) error { return nil })
+}
+
+// AcceptAll accepts all pending enlistments
+func (m *Machines) AcceptAll() error {
+	qsp := url.Values{}
+	return m.client().Post("accept_all", qsp, func(data []byte) error { return nil })
+}
+
+// ListAllocated lists allocated machines
+func (m *Machines) ListAllocated() ([]entity.Machine, error) {
+	machines := make([]entity.Machine, 0)
+	err := m.client().Get("list_allocated", url.Values{}, func(data []byte) error {
+		return json.Unmarshal(data, &machines)
+	})
+
+	return machines, err
 }

@@ -5,39 +5,48 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/canonical/gomaasclient/entity"
 	"github.com/google/go-querystring/query"
-	"github.com/maas/gomaasclient/entity"
 )
 
+// Domains implements api.Domains
 type Domains struct {
-	ApiClient ApiClient
+	APIClient APIClient
 }
 
-func (d *Domains) client() ApiClient {
-	return d.ApiClient.GetSubObject("domains")
+func (d *Domains) client() APIClient {
+	return d.APIClient.GetSubObject("domains")
 }
 
-func (d *Domains) Get() (domains []entity.Domain, err error) {
-	err = d.client().Get("", url.Values{}, func(data []byte) error {
+// Get fetches a list of Domain objects
+func (d *Domains) Get() ([]entity.Domain, error) {
+	domains := make([]entity.Domain, 0)
+	err := d.client().Get("", url.Values{}, func(data []byte) error {
 		return json.Unmarshal(data, &domains)
 	})
-	return
+
+	return domains, err
 }
 
-func (d *Domains) Create(params *entity.DomainParams) (domain *entity.Domain, err error) {
+// Create creates a new Domain
+func (d *Domains) Create(params *entity.DomainParams) (*entity.Domain, error) {
 	qsp, err := query.Values(params)
 	if err != nil {
-		return
+		return nil, err
 	}
-	domain = new(entity.Domain)
+
+	domain := new(entity.Domain)
 	err = d.client().Post("", qsp, func(data []byte) error {
 		return json.Unmarshal(data, domain)
 	})
-	return
+
+	return domain, err
 }
 
+// SetSerial sets the SOA serial for all domains
 func (d *Domains) SetSerial(serial int) error {
 	qsp := url.Values{}
 	qsp.Set("serial", fmt.Sprintf("%v", serial))
+
 	return d.client().Post("", qsp, func(data []byte) error { return nil })
 }

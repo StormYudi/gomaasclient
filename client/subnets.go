@@ -1,37 +1,44 @@
+//nolint:dupl // disable dupl check on client for now
 package client
 
 import (
 	"encoding/json"
 	"net/url"
 
+	"github.com/canonical/gomaasclient/entity"
 	"github.com/google/go-querystring/query"
-	"github.com/maas/gomaasclient/entity"
 )
 
-// Contains functionality for manipulating the Subnets entity.
+// Subnets contains functionality for manipulating the Subnets entity.
 type Subnets struct {
-	ApiClient ApiClient
+	APIClient APIClient
 }
 
-func (s *Subnets) client() ApiClient {
-	return s.ApiClient.GetSubObject("subnets")
+func (s *Subnets) client() APIClient {
+	return s.APIClient.GetSubObject("subnets")
 }
 
-func (s *Subnets) Get() (subnets []entity.Subnet, err error) {
-	err = s.client().Get("", url.Values{}, func(data []byte) error {
+// Get fetches a list of Subnet objects
+func (s *Subnets) Get() ([]entity.Subnet, error) {
+	subnets := make([]entity.Subnet, 0)
+	err := s.client().Get("", url.Values{}, func(data []byte) error {
 		return json.Unmarshal(data, &subnets)
 	})
-	return
+
+	return subnets, err
 }
 
-func (s *Subnets) Create(params *entity.SubnetParams) (subnet *entity.Subnet, err error) {
+// Create creates a new Subnet
+func (s *Subnets) Create(params *entity.SubnetParams) (*entity.Subnet, error) {
 	qsp, err := query.Values(params)
 	if err != nil {
-		return
+		return nil, err
 	}
-	subnet = new(entity.Subnet)
+
+	subnet := new(entity.Subnet)
 	err = s.client().Post("", qsp, func(data []byte) error {
 		return json.Unmarshal(data, subnet)
 	})
-	return
+
+	return subnet, err
 }

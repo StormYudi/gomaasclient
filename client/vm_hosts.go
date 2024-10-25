@@ -1,37 +1,44 @@
+//nolint:dupl // disable dupl check on client for now
 package client
 
 import (
 	"encoding/json"
 	"net/url"
 
+	"github.com/canonical/gomaasclient/entity"
 	"github.com/google/go-querystring/query"
-	"github.com/maas/gomaasclient/entity"
 )
 
-// Contains functionality for manipulating the VMHosts entity.
+// VMHosts contains functionality for manipulating the VMHosts entity.
 type VMHosts struct {
-	ApiClient ApiClient
+	APIClient APIClient
 }
 
-func (p *VMHosts) client() ApiClient {
-	return p.ApiClient.GetSubObject("pods")
+func (p *VMHosts) client() APIClient {
+	return p.APIClient.GetSubObject("pods")
 }
 
-func (p *VMHosts) Get() (vmHosts []entity.VMHost, err error) {
-	err = p.client().Get("", url.Values{}, func(data []byte) error {
+// Get fetches a list of VMHost objects
+func (p *VMHosts) Get() ([]entity.VMHost, error) {
+	vmHosts := make([]entity.VMHost, 0)
+	err := p.client().Get("", url.Values{}, func(data []byte) error {
 		return json.Unmarshal(data, &vmHosts)
 	})
-	return
+
+	return vmHosts, err
 }
 
-func (m *VMHosts) Create(params *entity.VMHostParams) (vmHost *entity.VMHost, err error) {
+// Create creates a new VMHost
+func (p *VMHosts) Create(params *entity.VMHostParams) (*entity.VMHost, error) {
 	qsp, err := query.Values(params)
 	if err != nil {
-		return
+		return nil, err
 	}
-	vmHost = new(entity.VMHost)
-	err = m.client().Post("", qsp, func(data []byte) error {
+
+	vmHost := new(entity.VMHost)
+	err = p.client().Post("", qsp, func(data []byte) error {
 		return json.Unmarshal(data, vmHost)
 	})
-	return
+
+	return vmHost, err
 }

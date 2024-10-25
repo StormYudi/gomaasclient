@@ -3,7 +3,7 @@ package entity
 import (
 	"testing"
 
-	"github.com/maas/gomaasclient/test/helper"
+	"github.com/canonical/gomaasclient/test/helper"
 )
 
 func TestVMHostt(t *testing.T) {
@@ -14,6 +14,7 @@ func TestVMHostt(t *testing.T) {
 	if err := helper.TestdataFromJSON("maas/vm_host.json", vmHost); err != nil {
 		t.Fatal(err)
 	}
+
 	if err := helper.TestdataFromJSON("maas/vm_hosts.json", vmHosts); err != nil {
 		t.Fatal(err)
 	}

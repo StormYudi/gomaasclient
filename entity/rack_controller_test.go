@@ -3,10 +3,10 @@ package entity
 import (
 	"testing"
 
-	"github.com/maas/gomaasclient/test/helper"
+	"github.com/canonical/gomaasclient/test/helper"
 )
 
-func TestRackControllert(t *testing.T) {
+func TestRackController(t *testing.T) {
 	rackController := new(RackController)
 	rackControllers := new([]RackController)
 
@@ -14,6 +14,7 @@ func TestRackControllert(t *testing.T) {
 	if err := helper.TestdataFromJSON("maas/rack_controller.json", rackController); err != nil {
 		t.Fatal(err)
 	}
+
 	if err := helper.TestdataFromJSON("maas/rack_controllers.json", rackControllers); err != nil {
 		t.Fatal(err)
 	}
